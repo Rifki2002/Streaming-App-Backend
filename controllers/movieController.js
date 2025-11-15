@@ -1,8 +1,29 @@
 import db from "../config/db.js";
 
 export const getAllMovies = (req, res) => {
-  const sql = "SELECT * FROM episodemovie";
-  db.query(sql, (err, results) => {
+  const { genre, search, sortBy, sortDir } = req.query;
+  let sql = "SELECT * FROM episodemovie";
+  const conditions = [];
+  const params = [];
+
+  if (genre) {
+    conditions.push("Genre_ID = ?");
+    params.push(genre);
+  }
+  if (search) {
+    conditions.push("Title LIKE ?");
+    params.push(`%${search}%`);
+  }
+  if (conditions.length > 0) {
+    sql += " WHERE " + conditions.join(" AND ");
+  }
+  const allowedSort = ["Title", "Tahun", "Rating"];
+  if (sortBy && allowedSort.includes(sortBy)) {
+    const direction = sortDir && sortDir.toLowerCase() === "desc" ? "DESC" : "ASC";
+    sql += ` ORDER BY ${sortBy} ${direction}`;
+  }
+
+  db.query(sql, params, (err, results) => {
     if (err) return res.status(500).json({ message: err.message });
     res.json(results);
   });

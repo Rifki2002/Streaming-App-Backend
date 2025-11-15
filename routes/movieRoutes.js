@@ -7,12 +7,14 @@ import {
   deleteMovie
 } from "../controllers/movieController.js";
 
+import { verifyToken } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-router.get("/", getAllMovies);
-router.get("/:id", getMovieById);
-router.post("/", addMovie);
-router.patch("/:id", updateMovie);
-router.delete("/:id", deleteMovie);
+router.get("/", verifyToken, getAllMovies);
+router.get("/:id", verifyToken, getMovieById);
+router.post("/", verifyToken, addMovie);
+router.patch("/:id", verifyToken, updateMovie);
+router.delete("/:id", verifyToken, deleteMovie);
 
 export default router;
